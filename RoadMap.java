@@ -188,7 +188,6 @@ public class RoadMap {
 				vtx2.addIncidentRoad(reverseEdge);
 
 				roads.add(newEdge);
-
 			}
 
 			sc.close();
