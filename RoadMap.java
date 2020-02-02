@@ -232,13 +232,32 @@ public class RoadMap {
 		else{
 			try{
 
-				Vertex currentVertex = startVertex();
+				Vertex currentVertex = startVertex;
 
 				while (currentVertex.getIndex() != endVertex.getIndex()){
+
+					int noOfEdges = currentVertex.getIncidentRoads().size();
+
+					//initilaize array to store boolean values
+
+					Boolean[] charingStationStatus = new Boolean[numPlaces()];
+
 					//for loop to iterate through each edge on the vertex
-						//If the vertex is equal to end vertex
-						//If the edge has a vertex with charging station make currentVertex the destination Vertex
-						//else move onto next edge
+					for (int i=0; i < noOfEdges; i++){
+						if(){ 
+							//If the edge has a vertex with charging station make currentVertex the destination Vertex
+						}
+						else if(i == noOfEdges - 1){
+							return false;
+							break;
+						}
+						else{
+							//else move onto next edge
+
+						}
+
+
+					}
 
 				}
 			}
