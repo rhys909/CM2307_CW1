@@ -1,6 +1,6 @@
 
-/* Put your student number here
- *
+/* C1821631
+	Rhys Connor
  * Optionally, if you have any comments regarding your submission, put them here.
  * For instance, specify here if your program does not generate the proper output or does not do it in the correct manner.
  */
@@ -164,8 +164,8 @@ public class RoadMap {
 				// Add your code here to create a new vertex using the information above and add
 				// it to places
 
-				Vertex newVertex = Vertex(placeName, hasChargingStataion, i);
-				places.add(newVertex)
+				Vertex newVertex = new Vertex(placeName, hasChargingStataion, i);
+				places.add(newVertex);
 
 			}
 
@@ -181,8 +181,8 @@ public class RoadMap {
 				// it to roads
 				// You should also set up incidentRoads for each vertex
 
-				Edge newEdge = Edge(length, vtx1, vtx2);
-				Edge reverseEdge = edge(length, vtx2, vtx1);
+				Edge newEdge = new Edge(length, vtx1, vtx2);
+				Edge reverseEdge = new Edge(length, vtx2, vtx1);
 
 				vtx1.addIncidentRoad(newEdge);
 				vtx2.addIncidentRoad(reverseEdge);
@@ -215,6 +215,7 @@ public class RoadMap {
 		}
 
 		// Add your code here
+		return null;
 	}
 
 	// Check if two vertices are connected by a path with charging stations on each itermediate vertex.
@@ -228,6 +229,24 @@ public class RoadMap {
 		}
 
 		// Add your code here
+		else{
+			try{
+
+				Vertex currentVertex = startVertex();
+
+				while (currentVertex.getIndex() != endVertex.getIndex()){
+					//for loop to iterate through each edge on the vertex
+						//If the vertex is equal to end vertex
+						//If the edge has a vertex with charging station make currentVertex the destination Vertex
+						//else move onto next edge
+
+				}
+			}
+			catch(Exception e){
+				System.out.println(e);
+			}
+		return false;
+		}
 	}
 
 	public void printMap() {
