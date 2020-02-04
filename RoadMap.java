@@ -215,6 +215,11 @@ public class RoadMap {
 		}
 
 		// Add your code here
+		else{
+			
+
+
+		}
 		return null;
 	}
 
@@ -251,6 +256,7 @@ public class RoadMap {
 				ArrayList<Edge> currentVertexEdges = new ArrayList<Edge>(currentVertex.getIncidentRoads());
 
 				//for loop to iterate through each edge on the vertex
+				//Could use for (Edge edge : currentVertex.getIncidentRoads()){}; 
 				for (int i=0; i < noOfEdges; i++){
 
 					Edge currentEdge = currentVertexEdges.get(i);
