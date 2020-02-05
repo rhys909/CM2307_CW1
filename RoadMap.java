@@ -245,7 +245,7 @@ public class RoadMap {
 				int noOfEdges = currentVertex.getIncidentRoads().size();
 				int x = 0;
 
-				//initilaize array to store boolean values
+				//initilaize array to store boolean values 
 				List<Boolean> charingStationList = new ArrayList<Boolean>();
 
 				//Array to store the vertex visited
