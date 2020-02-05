@@ -217,10 +217,68 @@ public class RoadMap {
 		// Add your code here
 		else{
 			
+			Set<Vertex> visitedVerticies= new HashSet<Vertex>();
+			Set<Vertex> unvisitedVerticies = new HashSet<Vertex>();
+
+			visitedVerticies.add(startVertex);
+			path.add(startVertex);
+			int currentVertexIndex = startVertex.getIndex();
+
+			for (Vertex v : places) unvisitedVerticies.add(v);
+
+			while (unvisitedVerticies.size() > 0 || !(path.contains(endVertex))){
 
 
+				Vertex currentVertex = places.get(currentVertexIndex);
+				int noOfEdges = currentVertex.getIncidentRoads().size();
+
+
+				PriorityQueue<Edge> adjacentEdges = new PriorityQueue<Edge>(noOfEdges, new Comparator<Edge>(){
+					public int compare(Edge e1, Edge e2){
+						//comparitor added to order by length of edge
+						if (e1.getLength() < e2.getLength()) return -1;
+						if (e1.getLength() > e2.getLength()) return 1;
+						return 0;
+					}
+				});
+
+				//add edges to priority queue 
+				for (Edge e: startVertex.getIncidentRoads()){
+					adjacentEdges.add(e);
+				}
+
+				//print statement to debug and ensure that each vertex is in correct order 
+				System.out.println(adjacentEdges);
+				Edge edgeToUse = adjacentEdges.peek();
+				
+				//take the edge to use and compare the current vertex to the two stored in the edge
+				if (edgeToUse.getFirstVertex() != currentVertex){
+
+					if (edgeToUse.getFirstVertex() == endVertex){
+
+						path.add(edgeToUse.getFirstVertex());
+
+					}else{
+
+						path.add(edgeToUse.getFirstVertex());
+						currentVertexIndex = edgeToUse.getFirstVertex().getIndex();
+
+					}
+				}else{
+					if (edgeToUse.getSecondVertex() == endVertex){
+
+						path.add(edgeToUse.getSecondVertex());
+
+					}else{
+
+						path.add(edgeToUse.getSecondVertex());
+						currentVertexIndex = edgeToUse.getSecondVertex().getIndex();
+
+					}
+				}
+			}
+			return path;
 		}
-		return null;
 	}
 
 	// Check if two vertices are connected by a path with charging stations on each itermediate vertex.
