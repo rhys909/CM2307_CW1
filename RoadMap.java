@@ -129,11 +129,12 @@ public class RoadMap {
 				System.out.println("There is no path connecting " + map.getPlace(startVertexIdx).getName() + " and "
 						+ map.getPlace(endVertexIdx).getName() + " with charging stations");
 			} else {
-				ArrayList<Vertex> path = map.shortestPathWithChargingStations(startVertex, endVertex);
+				/*ArrayList<Vertex> path = map.shortestPathWithChargingStations(startVertex, endVertex);
 				System.out.println();
 				System.out.println("Shortest path with charging stations between " + startVertex.getName() + " and "
 						+ endVertex.getName() + ":");
-				map.printPath(path);
+				map.printPath(path);*/
+				System.out.println("YES");
 			}
 
 		} else {
@@ -365,17 +366,19 @@ public class RoadMap {
 
 						if(currentEdge.getSecondVertex().hasChargingStation() == true){ 
 								
-							if (currentEdge.getSecondVertex().getIndex() == endVertex.getIndex()){
+							if (currentEdge.getSecondVertex() == endVertex){
 
 								if (charingStationList.contains(false)){
 									//sanity check 
 									isConnectedWithChargingStationsStatus = 0;
 									//to ensure exit out of loop
 									currentVertexIndex = endVertex.getIndex();
+									vertexVisited[x] = currentVertexIndex;
 								} else{
 									isConnectedWithChargingStationsStatus = 1;
 									//to ensure exit out of loop
 									currentVertexIndex = endVertex.getIndex();
+									vertexVisited[x] = currentVertexIndex;
 								}
 							}
 							else{
@@ -386,6 +389,23 @@ public class RoadMap {
 								currentVertex = currentEdge.getSecondVertex();
 								currentVertexIndex = currentEdge.getSecondVertex().getIndex();
 							}
+						} else if(currentEdge.getSecondVertex() == endVertex){
+							
+							if (charingStationList.contains(false)){
+								//sanity check 
+								isConnectedWithChargingStationsStatus = 0;
+								//to ensure exit out of loop
+								currentVertexIndex = endVertex.getIndex();
+								vertexVisited[x] = currentVertexIndex;
+							} else if(!(i == noOfEdges - 1)){
+								
+							}else{
+								isConnectedWithChargingStationsStatus = 1;
+								//to ensure exit out of loop
+								currentVertexIndex = endVertex.getIndex();
+								vertexVisited[x] = currentVertexIndex;
+							}
+
 						} else if (i == noOfEdges - 1) {
 							charingStationList.add(false);
 							vertexVisited[x] = currentVertex.getIndex();
