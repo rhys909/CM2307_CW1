@@ -281,7 +281,46 @@ public class RoadMap {
 		}
 	}
 
-	// Check if two vertices are connected by a path with charging stations on each itermediate vertex.
+	void depthSearch(int startVertex){
+		
+		boolean[] vertexVisited = new boolean[numPlaces()];
+
+		dfsRecursion(startVertex, vertexVisited);
+
+	}
+
+	private void dfsRecursion(int currentVertex, boolean[] vertexVisited) {
+
+		vertexVisited[currentVertex] = true;
+
+		Vertex vertex = places.get(currentVertex);
+
+		int noOfEdges = vertex.getIncidentRoads().size();
+
+		PriorityQueue<Edge> adjacentEdges = new PriorityQueue<Edge>(noOfEdges, new Comparator<Edge>(){
+			public int compare(Edge e1, Edge e2){
+				//comparitor added to order by length of edge
+				if (e1.getLength() < e2.getLength()) return -1;
+				if (e1.getLength() > e2.getLength()) return 1;
+				return 0;
+			}
+		});
+
+		for (Edge e : adjacentEdges){
+			if ((e.getFirstVertex() == vertex) & !vertexVisited[e.getSecondVertex().getIndex()]){
+
+				dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited);
+				
+			} else if(!vertexVisited[e.getFirstVertex().getIndex()]){
+
+				dfsRecursion(e.getFirstVertex().getIndex(), vertexVisited);
+
+			}
+		}
+	}
+
+	// Check if two vertices are connected by a path with charging stations on each
+	// itermediate vertex.
 	// Return true if such a path exists; return false otherwise.
 	// The worst-case time complexity of your algorithm should be no worse than O(v + e),
 	// where v and e are the number of vertices and the number of edges in the graph.
@@ -336,7 +375,7 @@ public class RoadMap {
 								} else{
 									isConnectedWithChargingStationsStatus = 1;
 									//to ensure exit out of loop
-									currentVertexIndex = currentEdge.getSecondVertex().getIndex();
+									currentVertexIndex = endVertex.getIndex();
 								}
 							}
 							else{
