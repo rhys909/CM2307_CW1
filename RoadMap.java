@@ -129,12 +129,11 @@ public class RoadMap {
 				System.out.println("There is no path connecting " + map.getPlace(startVertexIdx).getName() + " and "
 						+ map.getPlace(endVertexIdx).getName() + " with charging stations");
 			} else {
-				/*ArrayList<Vertex> path = map.shortestPathWithChargingStations(startVertex, endVertex);
+				ArrayList<Vertex> path = map.shortestPathWithChargingStations(startVertex, endVertex);
 				System.out.println();
 				System.out.println("Shortest path with charging stations between " + startVertex.getName() + " and "
 						+ endVertex.getName() + ":");
-				map.printPath(path);*/
-				System.out.println("YES");
+				map.printPath(path);
 			}
 
 		} else {
@@ -217,84 +216,39 @@ public class RoadMap {
 
 		// Add your code here
 		else{
-			
-			Set<Vertex> visitedVerticies= new HashSet<Vertex>();
-			Set<Vertex> unvisitedVerticies = new HashSet<Vertex>();
 
-			visitedVerticies.add(startVertex);
-			path.add(startVertex);
-			int currentVertexIndex = startVertex.getIndex();
+			Stack<Vertex> spanningTree = depthSearch(startVertex.getIndex(), true);
 
-			for (Vertex v : places) unvisitedVerticies.add(v);
-
-			while (unvisitedVerticies.size() > 0 || !(path.contains(endVertex))){
-
-
-				Vertex currentVertex = places.get(currentVertexIndex);
-				int noOfEdges = currentVertex.getIncidentRoads().size();
-
-
-				PriorityQueue<Edge> adjacentEdges = new PriorityQueue<Edge>(noOfEdges, new Comparator<Edge>(){
-					public int compare(Edge e1, Edge e2){
-						//comparitor added to order by length of edge
-						if (e1.getLength() < e2.getLength()) return -1;
-						if (e1.getLength() > e2.getLength()) return 1;
-						return 0;
-					}
-				});
-
-				//add edges to priority queue 
-				for (Edge e: startVertex.getIncidentRoads()){
-					adjacentEdges.add(e);
+			for(Vertex v : spanningTree){
+				if (v == endVertex){
+					path.add(v);
+					break;
 				}
-
-				//print statement to debug and ensure that each vertex is in correct order 
-				System.out.println(adjacentEdges);
-				Edge edgeToUse = adjacentEdges.peek();
-				
-				//take the edge to use and compare the current vertex to the two stored in the edge
-				if (edgeToUse.getFirstVertex() != currentVertex){
-
-					if (edgeToUse.getFirstVertex() == endVertex){
-
-						path.add(edgeToUse.getFirstVertex());
-
-					}else{
-
-						path.add(edgeToUse.getFirstVertex());
-						currentVertexIndex = edgeToUse.getFirstVertex().getIndex();
-
-					}
-				}else{
-					if (edgeToUse.getSecondVertex() == endVertex){
-
-						path.add(edgeToUse.getSecondVertex());
-
-					}else{
-
-						path.add(edgeToUse.getSecondVertex());
-						currentVertexIndex = edgeToUse.getSecondVertex().getIndex();
-
-					}
+				else{
+					path.add(v);
 				}
 			}
 			return path;
 		}
 	}
 
-	void depthSearch(int startVertex){
+	Stack<Vertex> depthSearch(int startVertex, boolean x) {
 		
 		boolean[] vertexVisited = new boolean[numPlaces()];
+		Stack<Vertex> spanningTree = new Stack<Vertex>();
 
-		dfsRecursion(startVertex, vertexVisited);
+		if (x) dfsRecursion(startVertex, vertexVisited, spanningTree);
+		if (!x) chargingStationDFS(startVertex, vertexVisited, spanningTree);
 
+		return spanningTree;
 	}
 
-	private void dfsRecursion(int currentVertex, boolean[] vertexVisited) {
+	private void chargingStationDFS(int currentVertex, boolean[] vertexVisited, Stack<Vertex> spanningTree) {
 
 		vertexVisited[currentVertex] = true;
 
 		Vertex vertex = places.get(currentVertex);
+		spanningTree.add(vertex);
 
 		int noOfEdges = vertex.getIncidentRoads().size();
 
@@ -307,15 +261,100 @@ public class RoadMap {
 			}
 		});
 
+		for (Edge e : vertex.getIncidentRoads()) {
+			if(e.getSecondVertex().hasChargingStation()){
+				adjacentEdges.add(e);
+			}
+		}			
+
 		for (Edge e : adjacentEdges){
-			if ((e.getFirstVertex() == vertex) & !vertexVisited[e.getSecondVertex().getIndex()]){
+			
+			e = adjacentEdges.poll();
 
-				dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited);
+			if (!vertexVisited[e.getSecondVertex().getIndex()]){
+
+				dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited, spanningTree);
 				
-			} else if(!vertexVisited[e.getFirstVertex().getIndex()]){
+			} 
+		}
+	}
 
-				dfsRecursion(e.getFirstVertex().getIndex(), vertexVisited);
+	private void dfsRecursion(int currentVertex, boolean[] vertexVisited, Stack<Vertex> spanningTree) {
 
+		vertexVisited[currentVertex] = true;
+
+		Vertex vertex = places.get(currentVertex);
+		spanningTree.add(vertex);
+
+		int noOfEdges = vertex.getIncidentRoads().size();
+
+		PriorityQueue<Edge> adjacentEdges = new PriorityQueue<Edge>(noOfEdges, new Comparator<Edge>(){
+			public int compare(Edge e1, Edge e2){
+				//comparitor added to order by length of edge
+				if (e1.getLength() < e2.getLength()) return -1;
+				if (e1.getLength() > e2.getLength()) return 1;
+				return 0;
+			}
+		});
+
+		boolean hasChargingStataionInRoute = false;
+
+		if (spanningTree.size() == 0){
+			for (Edge e : vertex.getIncidentRoads()) {
+				if(e.getSecondVertex().hasChargingStation()){
+					adjacentEdges.add(e);
+				}
+			}			
+	
+			for (Edge e : adjacentEdges){
+				
+				e = adjacentEdges.poll();
+	
+				if (!vertexVisited[e.getSecondVertex().getIndex()]){
+	
+					dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited, spanningTree);
+					
+				} 
+			}
+		}else{
+			for (Vertex v : spanningTree){
+				if(v.hasChargingStation()){
+					hasChargingStataionInRoute = true;
+				}
+			}
+
+			if (hasChargingStataionInRoute == false){
+				//should never hit this however if needed this should resolve the issue
+				for (Edge e : vertex.getIncidentRoads()) {
+					if(e.getSecondVertex().hasChargingStation()){
+						adjacentEdges.add(e);
+					}
+				}			
+		
+				for (Edge e : adjacentEdges){
+					
+					e = adjacentEdges.poll();
+		
+					if (!vertexVisited[e.getSecondVertex().getIndex()]){
+		
+						dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited, spanningTree);
+						
+					} 
+				} 
+			} else {
+				
+				for (Edge e : vertex.getIncidentRoads()) adjacentEdges.add(e);				
+
+				for (int i=0; i < noOfEdges; i++){
+					
+					Edge e = adjacentEdges.poll();
+		
+					if (!vertexVisited[e.getSecondVertex().getIndex()]){
+		
+						dfsRecursion(e.getSecondVertex().getIndex(), vertexVisited, spanningTree);
+						
+					} 
+				}				
 			}
 		}
 	}
@@ -332,92 +371,26 @@ public class RoadMap {
 		}
 		// Add your code here
 		else{
-			int currentVertexIndex = startVertex.getIndex();
 			
 			int isConnectedWithChargingStationsStatus = 0;
 
-			while (currentVertexIndex != endVertex.getIndex()){
+			Stack<Vertex> spanningTree = depthSearch(startVertex.getIndex(), false);
 
-				Vertex currentVertex = places.get(currentVertexIndex);
-				
-				int noOfEdges = currentVertex.getIncidentRoads().size();
-				int x = 0;
+			if(spanningTree.size() != 0){
+				for (Vertex v : spanningTree){
 
-				//initilaize array to store boolean values 
-				List<Boolean> charingStationList = new ArrayList<Boolean>();
-
-				//Array to store the vertex visited
-				Integer[] vertexVisited = new Integer[numPlaces()];
-				vertexVisited[x] = currentVertex.getIndex();
-				x++;
-
-				ArrayList<Edge> currentVertexEdges = new ArrayList<Edge>(currentVertex.getIncidentRoads());
-
-				//for loop to iterate through each edge on the vertex
-				//Could use for (Edge edge : currentVertex.getIncidentRoads()){}; 
-				for (int i=0; i < noOfEdges; i++){
-
-					Edge currentEdge = currentVertexEdges.get(i);
-
-					//array to list to check value
-					List<Integer> vertexVisitedList = Arrays.asList(vertexVisited);
-
-					if (x == 0 || !(vertexVisitedList.contains(currentEdge.getSecondVertex().getIndex()))){
-
-						if(currentEdge.getSecondVertex().hasChargingStation() == true){ 
-								
-							if (currentEdge.getSecondVertex() == endVertex){
-
-								if (charingStationList.contains(false)){
-									//sanity check 
-									isConnectedWithChargingStationsStatus = 0;
-									//to ensure exit out of loop
-									currentVertexIndex = endVertex.getIndex();
-									vertexVisited[x] = currentVertexIndex;
-								} else{
-									isConnectedWithChargingStationsStatus = 1;
-									//to ensure exit out of loop
-									currentVertexIndex = endVertex.getIndex();
-									vertexVisited[x] = currentVertexIndex;
-								}
-							}
-							else{
-								//If the edge has a vertex with charging station make currentVertex the destination Vertex
-								charingStationList.add(true);
-								vertexVisited[x] = currentVertex.getIndex();
-								x++;
-								currentVertex = currentEdge.getSecondVertex();
-								currentVertexIndex = currentEdge.getSecondVertex().getIndex();
-							}
-						} else if(currentEdge.getSecondVertex() == endVertex){
-							
-							if (charingStationList.contains(false)){
-								//sanity check 
-								isConnectedWithChargingStationsStatus = 0;
-								//to ensure exit out of loop
-								currentVertexIndex = endVertex.getIndex();
-								vertexVisited[x] = currentVertexIndex;
-							} else if(!(i == noOfEdges - 1)){
-								
-							}else{
-								isConnectedWithChargingStationsStatus = 1;
-								//to ensure exit out of loop
-								currentVertexIndex = endVertex.getIndex();
-								vertexVisited[x] = currentVertexIndex;
-							}
-
-						} else if (i == noOfEdges - 1) {
-							charingStationList.add(false);
-							vertexVisited[x] = currentVertex.getIndex();
-							x++;
-							isConnectedWithChargingStationsStatus = 0;
-							//to ensure exit out of loop
-							currentVertexIndex = endVertex.getIndex();
+					ArrayList<Edge> adjEdges = v.getIncidentRoads();
+					
+					for (Edge e : adjEdges){
+						if (e.getSecondVertex() == endVertex){
+							isConnectedWithChargingStationsStatus = 1;
 						}
-					} 
+					}
 				}
+				return isConnectedWithChargingStationsStatus == 1;
+			}else{
+				return false;
 			}
-		return isConnectedWithChargingStationsStatus == 1;
 		}
 	}
 
