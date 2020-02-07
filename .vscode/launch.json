@@ -16,7 +16,7 @@
             "request": "launch",
             "mainClass": "RoadMap",
             "projectName": "CM2307_CW1_2437d9a7",
-            "args": "-s Map.txt 0 3"
+            "args": "-s Map.txt 3 0"
         }
     ]
 }
